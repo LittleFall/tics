@@ -13,6 +13,9 @@ if (NOT MSVC)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-old-style-cast")
 endif ()
 
+message(WARNING "use contrib/grpc")
+add_subdirectory (grpc)
+
 if (USE_INTERNAL_BOOST_LIBRARY)
     add_subdirectory (boost-cmake)
 endif ()
