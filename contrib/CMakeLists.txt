@@ -111,6 +111,7 @@ if (NOT ARCH_ARM)
 endif ()
 
 if (USE_INTERNAL_SSL_LIBRARY)
+    message(WARNING "USE_INTERNAL_SSL_LIBRARY")
     if (NOT MAKE_STATIC_LIBRARIES)
         set (BUILD_SHARED 1)
     endif ()
