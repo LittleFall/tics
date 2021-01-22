@@ -59,3 +59,4 @@
 [submodule "contrib/grpc"]
 	path = contrib/grpc
 	url = https://github.com/grpc/grpc
+    branch = v1.26.x
