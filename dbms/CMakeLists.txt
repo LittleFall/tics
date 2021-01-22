@@ -177,8 +177,8 @@ target_link_libraries (dbms
     kvproto
     kv_client
     tipb
-    ${Protobuf_LIBRARIES}
-    gRPC::grpc++_unsecure
+    ${_PROTOBUF_LIBPROTOBUF}
+    ${_GRPC_GRPCPP_UNSECURE}
     ${CURL_LIBRARIES}
     ${MYSQLXX_LIBRARY}
     ${RE2_LIBRARY}
@@ -322,3 +322,5 @@ if (TEST_COVERAGE AND CMAKE_BUILD_TYPE STREQUAL "Debug")
             EXECUTABLE gtests_dbms
     )
 endif()
+
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter")

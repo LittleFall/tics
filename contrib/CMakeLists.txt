@@ -7,14 +7,25 @@ set (ENABLE_TESTS 0)
 add_subdirectory (client-c)
 set (ENABLE_TESTS ${_save})
 # -------
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter")
 add_subdirectory (tipb/cpp)
 
 if (NOT MSVC)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-old-style-cast")
 endif ()
 
+include(CheckCXXCompilerFlag)
+
 if (USE_INTERNAL_GRPC_LIBRARY)
+#    check_cxx_compiler_flag(-Wunused-parameter HAS_FLAG_UNUSED_PARAMETER)
+#    if (HAS_FLAG_UNUSED_PARAMETER)
+#        add_compile_options(-Wno-unused-parameter)
+#    endif()
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter")
     add_subdirectory (grpc)
+#    if (HAS_FLAG_UNUSED_PARAMETER)
+#        add_compile_options(-Wunused-parameter)
+#    endif()
 endif ()
 
 if (USE_INTERNAL_BOOST_LIBRARY)

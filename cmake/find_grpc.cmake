@@ -8,19 +8,18 @@ if (USE_INTERNAL_GRPC_LIBRARY AND NOT EXISTS "${ClickHouse_SOURCE_DIR}/contrib/g
 endif()
 
 if (USE_INTERNAL_GRPC_LIBRARY)
-    add_subdirectory(contrib/grpc ${CMAKE_CURRENT_BINARY_DIR}/grpc EXCLUDE_FROM_ALL)
+    # add_subdirectory(contrib/grpc ${CMAKE_CURRENT_BINARY_DIR}/grpc EXCLUDE_FROM_ALL)
     message(STATUS "Using gRPC via add_subdirectory.")
 
-    # After using add_subdirectory, we can now use the grpc targets directly from
-    # this build.
+    # After using add_subdirectory, we can now use the grpc targets directly from this build.
     set(_PROTOBUF_LIBPROTOBUF libprotobuf)
     set(_PROTOBUF_PROTOC $<TARGET_FILE:protoc>)
     set(_GRPC_GRPCPP_UNSECURE grpc++_unsecure)
     set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:grpc_cpp_plugin>)
 else()
-    message(WARNING "${USE_INTERNAL_GRPC_LIBRARY}")
+    # Use System grpc
+    message(STATUS "Using system gRPC.")
 
-    message(WARNING "${USE_INTERNAL_GRPC_LIBRARY}")
     find_package(Protobuf REQUIRED)
     message(STATUS "Using protobuf: ${Protobuf_VERSION} : ${Protobuf_INCLUDE_DIRS}, ${Protobuf_LIBRARIES}")
 
@@ -36,5 +35,10 @@ else()
     message(STATUS "Using gRPC: ${gRPC_VERSION}")
 
     set(gRPC_FOUND TRUE)
+
+    set(_PROTOBUF_LIBPROTOBUF protobuf::libprotobuf)
+    set(_PROTOBUF_PROTOC $<TARGET_FILE:protobuf::protoc>)
+    set(_GRPC_GRPCPP_UNSECURE gRPC::grpc++_unsecure)
+    set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_cpp_plugin>)
 endif()
 
