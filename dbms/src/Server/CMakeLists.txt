@@ -30,28 +30,6 @@ add_library (clickhouse-server-lib
     ClusterManagerService.cpp)
 
 # proxy start
-set(PROXY_LIB_FILE "${ClickHouse_SOURCE_DIR}/contrib/tiflash-proxy/target/release/libtiflash_proxy")
-if (APPLE)
-    set(PROXY_LIB_FILE "${PROXY_LIB_FILE}.dylib")
-elseif (WINDOWS)
-    set(PROXY_LIB_FILE "${PROXY_LIB_FILE}.dll")
-else()
-    set(PROXY_LIB_FILE "${PROXY_LIB_FILE}.so")
-endif()
-
-file(GLOB_RECURSE TIFLASH_PROXY_SOURCES RELATIVE ${ClickHouse_SOURCE_DIR}/contrib/tiflash-proxy "src/*.rs")
-
-add_custom_target(PROXY_LIB_TARGET
-    COMMAND make release
-    WORKING_DIRECTORY ${ClickHouse_SOURCE_DIR}/contrib/tiflash-proxy/
-    DEPENDS ${TIFLASH_PROXY_SOURCES}
-    COMMENT "bundled building tiflash_proxy..."
-)
-
-add_library(PROXY_LIB SHARED IMPORTED GLOBAL)
-add_dependencies(PROXY_LIB PROXY_LIB_TARGET)
-set_target_properties(PROXY_LIB PROPERTIES IMPORTED_LOCATION ${PROXY_LIB_FILE})
-
 target_link_libraries(clickhouse-server-lib PRIVATE PROXY_LIB)
 # proxy end
 

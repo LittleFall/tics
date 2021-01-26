@@ -283,6 +283,7 @@ include (cmake/find_llvm.cmake)
 include (cmake/find_grpc.cmake)
 include (cmake/find_kvproto.cmake)
 include (cmake/find_tipb.cmake)
+include (cmake/find_proxy.cmake)
 include (cmake/find_prometheus.cmake)
 
 

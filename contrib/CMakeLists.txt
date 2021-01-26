@@ -10,6 +10,8 @@ set (ENABLE_TESTS ${_save})
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter")
 add_subdirectory (tipb/cpp)
 
+add_subdirectory (tiflash-proxy)
+
 if (NOT MSVC)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-old-style-cast")
 endif ()
