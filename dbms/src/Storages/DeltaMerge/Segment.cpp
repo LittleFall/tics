@@ -1177,7 +1177,7 @@ std::pair<DeltaIndexPtr, bool> Segment::ensurePlace(const DMContext &         dm
     auto my_delta_index = delta_snap->shared_delta_index->tryClone(delta_snap->rows, delta_snap->deletes);
     auto my_delta_tree  = my_delta_index->getDeltaTree();
 
-    HandleRange relevant_range = mergeRanges(read_ranges);
+    HandleRange relevant_range = dm_context.enable_relevant_place ? mergeRanges(read_ranges) : HandleRange::newAll();
 
     auto [my_placed_rows, my_placed_deletes] = my_delta_index->getPlacedStatus();
 
