@@ -98,6 +98,11 @@ std::unordered_map<String, tipb::ScalarFuncSig> func_name_to_sig({
     {"cast_decimal_int", tipb::ScalarFuncSig::CastDecimalAsInt},
     {"cast_time_int", tipb::ScalarFuncSig::CastTimeAsInt},
     {"cast_string_int", tipb::ScalarFuncSig::CastStringAsInt},
+    {"cast_int_real", tipb::ScalarFuncSig::CastIntAsReal},
+    {"cast_real_real", tipb::ScalarFuncSig::CastRealAsReal},
+    {"cast_decimal_real", tipb::ScalarFuncSig::CastDecimalAsReal},
+    {"cast_time_real", tipb::ScalarFuncSig::CastTimeAsReal},
+    {"cast_string_real", tipb::ScalarFuncSig::CastStringAsReal},
     {"cast_int_decimal", tipb::ScalarFuncSig::CastIntAsDecimal},
     {"cast_real_decimal", tipb::ScalarFuncSig::CastRealAsDecimal},
     {"cast_decimal_decimal", tipb::ScalarFuncSig::CastDecimalAsDecimal},
@@ -617,6 +622,7 @@ void astToPB(const DAGSchema & input, ASTPtr ast, tipb::Expr * expr, uint32_t co
                 expr->set_sig(it_sig->second);
                 auto * ft = expr->mutable_field_type();
                 ft->set_tp(TiDB::TypeDouble);
+                ft->set_decimal(20);
                 break;
             }
             case tipb::ScalarFuncSig::CastIntAsDecimal:

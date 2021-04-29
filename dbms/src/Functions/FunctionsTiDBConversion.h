@@ -645,11 +645,8 @@ struct TiDBConvertToFloat
     {
         StringRef trim_string = trim(value);
         StringRef float_string = getValidFloatPrefix(trim_string);
-        if (trim_string.size == 0 && value.size != 0)
-        {
+        if (float_string.size < trim_string.size)
             context.getDAGContext()->handleTruncateError("cast str as real");
-            return 0.0;
-        }
         Float64 f = strtod(float_string.data, nullptr);
         return produceTargetFloat64(f, need_truncate, shift, max_f, context);
     }
@@ -724,8 +721,6 @@ struct TiDBConvertToFloat
         }
         else if constexpr (std::is_same_v<FromDataType, DataTypeString>)
         {
-            /// cast string as real
-            /// the implementation is quite different from TiDB/TiKV, so cast string as float will not be pushed to TiFlash
             const IColumn * col_from = block.getByPosition(arguments[0]).column.get();
             const ColumnString * col_from_string = checkAndGetColumn<ColumnString>(col_from);
             const ColumnString::Chars_t * chars = &col_from_string->getChars();
@@ -737,6 +732,11 @@ struct TiDBConvertToFloat
                 size_t string_size = next_offset - current_offset - 1;
                 StringRef string_value(&(*chars)[current_offset], string_size);
                 vec_to[i] = strToFloat(string_value, need_truncate, shift, max_f, context);
+                LOG_INFO(&Poco::Logger::get("conversion debug"), __FUNCTION__
+                      <<": \nsize=" << size
+                      <<", \ni="<<i
+                      <<", \nstring="<<string_value
+                      <<", \nresult="<<vec_to[i]);
                 current_offset = next_offset;
             }
         }

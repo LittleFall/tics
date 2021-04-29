@@ -21,8 +21,6 @@ StringRef trim(const StringRef & value)
         if (!spaces.count(value.data[end - 1]))
             break;
     }
-    if (start >= end)
-        return ret;
     ret.data = value.data + start;
     ret.size = end - start;
     return ret;
