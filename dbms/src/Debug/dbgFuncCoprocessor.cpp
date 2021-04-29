@@ -595,6 +595,41 @@ void astToPB(const DAGSchema & input, ASTPtr ast, tipb::Expr * expr, uint32_t co
                 expr->set_sig(tipb::ScalarFuncSig::DateFormatSig);
                 expr->mutable_field_type()->set_tp(TiDB::TypeString);
                 break;
+            case tipb::ScalarFuncSig::CastIntAsInt:
+            case tipb::ScalarFuncSig::CastRealAsInt:
+            case tipb::ScalarFuncSig::CastTimeAsInt:
+            case tipb::ScalarFuncSig::CastDecimalAsInt:
+            case tipb::ScalarFuncSig::CastStringAsInt:
+            {
+                expr->set_sig(it_sig->second);
+                auto * ft = expr->mutable_field_type();
+                ft->set_tp(TiDB::TypeLongLong);
+                ft->set_flag(TiDB::ColumnFlagUnsigned);
+                ft->set_collate(collator_id);
+                break;
+            }
+            case tipb::ScalarFuncSig::CastIntAsReal:
+            case tipb::ScalarFuncSig::CastRealAsReal:
+            case tipb::ScalarFuncSig::CastTimeAsReal:
+            case tipb::ScalarFuncSig::CastDecimalAsReal:
+            case tipb::ScalarFuncSig::CastStringAsReal:
+            {
+                expr->set_sig(it_sig->second);
+                auto * ft = expr->mutable_field_type();
+                ft->set_tp(TiDB::TypeDouble);
+                break;
+            }
+            case tipb::ScalarFuncSig::CastIntAsDecimal:
+            case tipb::ScalarFuncSig::CastRealAsDecimal:
+            case tipb::ScalarFuncSig::CastTimeAsDecimal:
+            case tipb::ScalarFuncSig::CastDecimalAsDecimal:
+            case tipb::ScalarFuncSig::CastStringAsDecimal:
+            {
+                expr->set_sig(it_sig->second);
+                auto * ft = expr->mutable_field_type();
+                ft->set_tp(TiDB::TypeNewDecimal);
+                break;
+            }
             case tipb::ScalarFuncSig::CastIntAsTime:
             case tipb::ScalarFuncSig::CastRealAsTime:
             case tipb::ScalarFuncSig::CastTimeAsTime:
@@ -611,6 +646,19 @@ void astToPB(const DAGSchema & input, ASTPtr ast, tipb::Expr * expr, uint32_t co
                 {
                     ft->set_tp(TiDB::TypeDate);
                 }
+                break;
+            }
+            case tipb::ScalarFuncSig::CastIntAsString:
+            case tipb::ScalarFuncSig::CastRealAsString:
+            case tipb::ScalarFuncSig::CastTimeAsString:
+            case tipb::ScalarFuncSig::CastDecimalAsString:
+            case tipb::ScalarFuncSig::CastStringAsString:
+            {
+                expr->set_sig(it_sig->second);
+                auto * ft = expr->mutable_field_type();
+                ft->set_tp(TiDB::TypeVarString);
+                ft->set_collate(collator_id);
+                ft->set_charset("utf8mb4");
                 break;
             }
             default:
@@ -1443,7 +1491,7 @@ struct Join : Executor
 
 using ExecutorPtr = std::shared_ptr<mock::Executor>;
 
-TiDB::ColumnInfo compileExpr(const DAGSchema & input, ASTPtr ast)
+TiDB::ColumnInfo compileExpr(const DAGSchema & input, const ASTPtr ast)
 {
     TiDB::ColumnInfo ci;
     if (ASTIdentifier * id = typeid_cast<ASTIdentifier *>(ast.get()))
@@ -1529,6 +1577,27 @@ TiDB::ColumnInfo compileExpr(const DAGSchema & input, ASTPtr ast)
             case tipb::ScalarFuncSig::DateFormatSig:
                 ci.tp = TiDB::TypeString;
                 break;
+            case tipb::ScalarFuncSig::CastIntAsInt:
+            case tipb::ScalarFuncSig::CastRealAsInt:
+            case tipb::ScalarFuncSig::CastTimeAsInt:
+            case tipb::ScalarFuncSig::CastDecimalAsInt:
+            case tipb::ScalarFuncSig::CastStringAsInt:
+                ci.tp = TiDB::TypeLongLong;
+                break;
+            case tipb::ScalarFuncSig::CastIntAsReal:
+            case tipb::ScalarFuncSig::CastRealAsReal:
+            case tipb::ScalarFuncSig::CastTimeAsReal:
+            case tipb::ScalarFuncSig::CastDecimalAsReal:
+            case tipb::ScalarFuncSig::CastStringAsReal:
+                ci.tp = TiDB::TypeDouble;
+                break;
+            case tipb::ScalarFuncSig::CastIntAsDecimal:
+            case tipb::ScalarFuncSig::CastRealAsDecimal:
+            case tipb::ScalarFuncSig::CastTimeAsDecimal:
+            case tipb::ScalarFuncSig::CastDecimalAsDecimal:
+            case tipb::ScalarFuncSig::CastStringAsDecimal:
+                ci.tp = TiDB::TypeNewDecimal;
+                break;
             case tipb::ScalarFuncSig::CastIntAsTime:
             case tipb::ScalarFuncSig::CastRealAsTime:
             case tipb::ScalarFuncSig::CastTimeAsTime:
@@ -1542,6 +1611,13 @@ TiDB::ColumnInfo compileExpr(const DAGSchema & input, ASTPtr ast)
                 {
                     ci.tp = TiDB::TypeDate;
                 }
+                break;
+            case tipb::ScalarFuncSig::CastIntAsString:
+            case tipb::ScalarFuncSig::CastRealAsString:
+            case tipb::ScalarFuncSig::CastTimeAsString:
+            case tipb::ScalarFuncSig::CastDecimalAsString:
+            case tipb::ScalarFuncSig::CastStringAsString:
+                ci.tp = TiDB::TypeString;
                 break;
             default:
                 ci.tp = TiDB::TypeLongLong;
@@ -1578,7 +1654,7 @@ TiDB::ColumnInfo compileExpr(const DAGSchema & input, ASTPtr ast)
                 ci.tp = TiDB::TypeNewDecimal;
                 break;
             case Field::Types::Which::String:
-                ci.tp = TiDB::TypeString;
+                ci.tp = TiDB::TypeVarString;
                 break;
             default:
                 throw Exception(String("Unsupported literal type: ") + lit->value.getTypeName(), ErrorCodes::LOGICAL_ERROR);

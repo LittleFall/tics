@@ -38,7 +38,7 @@ Block ArrowChunkCodec::decode(const tipb::Chunk & chunk, const DAGSchema & schem
     const char * pos = start;
     int column_index = 0;
     ColumnsWithTypeAndName columns;
-    while (pos < start + row_data.size())
+    while (column_index < static_cast<int>(schema.size()) && pos < start + row_data.size())
     {
         UInt32 length = toLittleEndian(*(reinterpret_cast<const UInt32 *>(pos)));
         pos += 4;
